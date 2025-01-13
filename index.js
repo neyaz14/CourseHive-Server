@@ -48,6 +48,9 @@ const client = new MongoClient(uri, {
 })
 async function run() {
   try {
+    // database 
+    const db = client.db('courseHive');
+    const usersCollection = db.collection('users');
     // Generate jwt token
     app.post('/jwt', async (req, res) => {
       const email = req.body
@@ -76,7 +79,24 @@ async function run() {
         res.status(500).send(err)
       }
     })
-
+    // save user 
+    // save or update a user in db
+    app.post('/users/:email', async (req, res) => {
+      const email = req.params.email
+      const query = { email }
+      const user = req.body
+      // check if user exists in db
+      const isExist = await usersCollection.findOne(query)
+      if (isExist) {
+        return res.send(isExist)
+      }
+      const result = await usersCollection.insertOne({
+        ...user,
+        role: 'student',
+        timestamp: Date.now(),
+      })
+      res.send(result)
+    })
     // Send a ping to confirm a successful connection
     // await client.db('admin').command({ ping: 1 })
     console.log(

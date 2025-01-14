@@ -28,6 +28,7 @@ async function run() {
     await client.connect();
 
     const userCollection = client.db("courseHive").collection("users");
+    const courseCollection = client.db("courseHive").collection("courses");
     
 
     // jwt related api
@@ -60,7 +61,6 @@ async function run() {
       res.send(result);
     });
 
-    
     app.post('/users/:email', async (req, res) => {
       const email = req.params.email
       const query = { email }
@@ -77,6 +77,23 @@ async function run() {
       })
       res.send(result)
     })
+
+    // ----------------------------------------------- 
+    // --------->     Courses 
+    app.post('/courses', verifyToken,async (req, res) => {
+      const courseInfo = req.body
+      // check if courseInfo exists in db
+      const result = await courseCollection.insertOne({
+        ...courseInfo,
+        status: 'pending',
+        timestamp: Date.now(),
+      })
+      res.send(result)
+    })
+    app.get('/courses', verifyToken, async (req, res) => {
+      const result = await courseCollection.find().toArray();
+      res.send(result);
+    });
 
 
     

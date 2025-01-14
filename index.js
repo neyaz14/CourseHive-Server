@@ -40,7 +40,7 @@ async function run() {
 
     // middlewares 
     const verifyToken = (req, res, next) => {
-      console.log('inside verify token', req.headers.authorization);
+      // console.log('inside verify token', req.headers.authorization);
       if (!req.headers.authorization) {
         return res.status(401).send({ message: 'unauthorized access' });
       }
@@ -90,6 +90,7 @@ async function run() {
       })
       res.send(result)
     })
+
     app.get('/courses', verifyToken, async (req, res) => {
       const result = await courseCollection.find().toArray();
       res.send(result);

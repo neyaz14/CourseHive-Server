@@ -61,16 +61,23 @@ async function run() {
     });
 
     
-    app.post('/users', async (req, res) => {
-      const user = req.body;
-      const query = { email: user.email }
-      const existingUser = await userCollection.findOne(query);
-      if (existingUser) {
-        return res.send({ message: 'user already exists', insertedId: null })
+    app.post('/users/:email', async (req, res) => {
+      const email = req.params.email
+      const query = { email }
+      const user = req.body
+      // check if user exists in db
+      const isExist = await userCollection.findOne(query)
+      if (isExist) {
+        return res.send(isExist)
       }
-      const result = await userCollection.insertOne(user);
-      res.send(result);
-    });
+      const result = await userCollection.insertOne({
+        ...user,
+        role: 'student',
+        timestamp: Date.now(),
+      })
+      res.send(result)
+    })
+
 
     
 
@@ -90,5 +97,5 @@ app.get('/', (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log(`Bistro boss is sitting on port ${port}`);
+  console.log(`Course Hive is sitting on port ${port}`);
 })

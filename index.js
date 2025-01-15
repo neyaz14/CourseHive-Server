@@ -29,7 +29,7 @@ async function run() {
 
     const userCollection = client.db("courseHive").collection("users");
     const courseCollection = client.db("courseHive").collection("courses");
-    
+
 
     // jwt related api
     app.post('/jwt', async (req, res) => {
@@ -56,7 +56,7 @@ async function run() {
 
 
     // users related api
-    app.get('/users', verifyToken, async (req, res) => {
+    app.get('/users', async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     });
@@ -78,9 +78,57 @@ async function run() {
       res.send(result)
     })
 
+    app.put('/users/:email', verifyToken, async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      // console.log(additionalInfo)
+      console.log(req.body)
+      try {
+        const user = await userCollection.findOne(query);
+        // console.log('user info', user)
+        if (!user ) return res.status(400).send('You have allready requested, wait for approval')
+        const options = { upsert: true }
+        const updatedDoc = {
+          $set: {
+            title: req.body.title,
+            experience: req.body.experience,
+            category: req.body.category,
+          }
+        }
+        console.log('updatedDoc : ', updatedDoc)
+        const result = await userCollection.updateOne(query, updatedDoc, options)
+        console.log('result ', result)
+        res.send(result)
+      } catch (err) { console.log(err) }
+    })
+
+    // manage user status 
+    app.patch('/users/:email', verifyToken, async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      // const additionalInfo = {
+      //   title: req.body.title,
+      //   experience: req.body.experience,
+      //   category: req.body.category,
+      // }
+      // console.log(additionalInfo)
+      const user = await userCollection.findOne(query);
+      // console.log('user info', user)
+      if (!user || user?.status === 'requested') return res.status(400).send('You have allready requested, wait for approval')
+      const updatedDoc = {
+        $set: {
+          status: 'requested'
+        }
+      }
+      console.log('updatedDoc : ', updatedDoc)
+      const result = await userCollection.updateOne(query, updatedDoc)
+      // console.log('result ', result)
+      res.send(result)
+    })
+
     // ----------------------------------------------- 
     // --------->     Courses 
-    app.post('/courses', verifyToken,async (req, res) => {
+    app.post('/courses', verifyToken, async (req, res) => {
       const courseInfo = req.body
       // check if courseInfo exists in db
       const result = await courseCollection.insertOne({
@@ -91,22 +139,22 @@ async function run() {
       res.send(result)
     })
 
-    app.get('/courses',  async (req, res) => {
+    app.get('/courses', async (req, res) => {
       const result = await courseCollection.find().toArray();
       res.send(result);
     });
 
-    app.get('/courses/:id',  async (req, res) => {
+    app.get('/courses/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
-      const result =await  courseCollection.findOne(query);
+      const query = { _id: new ObjectId(id) }
+      const result = await courseCollection.findOne(query);
       res.send(result);
     });
 
 
 
 
-    
+
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });

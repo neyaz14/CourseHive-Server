@@ -148,14 +148,15 @@ async function run() {
       const email = req.params.email;
       const query = { email };
       const user = await userCollection.findOne(query);
-      if (!user ) return res.status(400).send('You are not the user')
+      if (!user) return res.status(400).send('You are not the user')
       const updatedDoc = {
-        $unset:{status: '',
-          category:'',
-          experience:'',
+        $unset: {
+          status: '',
+          category: '',
+          experience: '',
           title: ''
         },
-        $set: {role: 'student'}
+        $set: { role: 'student' }
       }
       console.log(user)
       const result = await userCollection.updateOne(query, updatedDoc)
@@ -167,9 +168,9 @@ async function run() {
       const email = req.params.email;
       const query = { email };
       const user = await userCollection.findOne(query);
-      if (!user ) return res.status(400).send('You are not the user')
+      if (!user) return res.status(400).send('You are not the user')
       const updatedDoc = {
-        $set: {role: 'admin'}
+        $set: { role: 'admin' }
       }
       console.log(user)
       const result = await userCollection.updateOne(query, updatedDoc)
@@ -204,7 +205,29 @@ async function run() {
       res.send(result);
     });
 
-
+    // accept 
+    app.patch('/courses/acept/:id', verifyToken, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const course = await courseCollection.findOne(query);
+      const updatedDoc = {
+        $set: { status: 'accepted' }
+      }
+      const result = await courseCollection.updateOne(query, updatedDoc)
+      console.log(result)
+      res.send(result)
+    })
+    app.patch('/courses/reject/:id', verifyToken, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const course = await courseCollection.findOne(query);
+      const updatedDoc = {
+        $set: { status: 'rejected' }
+      }
+      const result = await courseCollection.updateOne(query, updatedDoc)
+      console.log(result)
+      res.send(result)
+    })
 
 
 

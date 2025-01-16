@@ -162,6 +162,20 @@ async function run() {
       console.log(result)
       res.send(result)
     })
+    // make admin 
+    app.patch('/user/admin/:email', verifyToken, async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const user = await userCollection.findOne(query);
+      if (!user ) return res.status(400).send('You are not the user')
+      const updatedDoc = {
+        $set: {role: 'admin'}
+      }
+      console.log(user)
+      const result = await userCollection.updateOne(query, updatedDoc)
+      console.log(result)
+      res.send(result)
+    })
 
 
 

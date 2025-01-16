@@ -56,6 +56,7 @@ async function run() {
 
 
     // users related api
+    // TODO : make it secure 
     app.get('/users', async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
@@ -124,6 +125,13 @@ async function run() {
       const result = await userCollection.updateOne(query, updatedDoc)
       // console.log('result ', result)
       res.send(result)
+    })
+
+    // to check the role 
+    app.get('/user/role/:email', async(req, res)=>{
+      const email = req.params.email;
+      const result = await userCollection.findOne({email})
+      res.send({role: result?.role})
     })
 
     // ----------------------------------------------- 

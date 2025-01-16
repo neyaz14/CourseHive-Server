@@ -137,12 +137,31 @@ async function run() {
           role: 'teacher'
         }
       }
+      // console.log(user)
+      const result = await userCollection.updateOne(query, updatedDoc)
+      // console.log(result)
+      res.send(result)
+    })
+
+    // reject teacher /user/teacher/reject/
+    app.patch('/user/teacher/reject/:email', verifyToken, async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const user = await userCollection.findOne(query);
+      if (!user ) return res.status(400).send('You are not the user')
+      const updatedDoc = {
+        $unset:{status: '',
+          category:'',
+          experience:'',
+          title: ''
+        },
+        $set: {role: 'student'}
+      }
       console.log(user)
       const result = await userCollection.updateOne(query, updatedDoc)
       console.log(result)
       res.send(result)
     })
-
 
 
 

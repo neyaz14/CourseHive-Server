@@ -83,11 +83,11 @@ async function run() {
       const email = req.params.email;
       const query = { email };
       // console.log(additionalInfo)
-      console.log(req.body)
+      // console.log(req.body)
       try {
         const user = await userCollection.findOne(query);
         // console.log('user info', user)
-        if (!user ) return res.status(400).send('You have allready requested, wait for approval')
+        if (!user) return res.status(400).send('You have allready requested, wait for approval')
         const options = { upsert: true }
         const updatedDoc = {
           $set: {
@@ -96,9 +96,9 @@ async function run() {
             category: req.body.category,
           }
         }
-        console.log('updatedDoc : ', updatedDoc)
+        // console.log('updatedDoc : ', updatedDoc)
         const result = await userCollection.updateOne(query, updatedDoc, options)
-        console.log('result ', result)
+        // console.log('result ', result)
         res.send(result)
       } catch (err) { console.log(err) }
     })
@@ -107,32 +107,44 @@ async function run() {
     app.patch('/users/:email', verifyToken, async (req, res) => {
       const email = req.params.email;
       const query = { email };
-      // const additionalInfo = {
-      //   title: req.body.title,
-      //   experience: req.body.experience,
-      //   category: req.body.category,
-      // }
-      // console.log(additionalInfo)
       const user = await userCollection.findOne(query);
-      // console.log('user info', user)
       if (!user || user?.status === 'requested') return res.status(400).send('You have allready requested, wait for approval')
       const updatedDoc = {
         $set: {
           status: 'requested'
         }
       }
-      console.log('updatedDoc : ', updatedDoc)
       const result = await userCollection.updateOne(query, updatedDoc)
-      // console.log('result ', result)
       res.send(result)
     })
 
     // to check the role 
-    app.get('/user/role/:email', async(req, res)=>{
+    app.get('/user/role/:email', async (req, res) => {
       const email = req.params.email;
-      const result = await userCollection.findOne({email})
-      res.send({role: result?.role})
+      const result = await userCollection.findOne({ email })
+      res.send({ role: result?.role })
     })
+
+    // to make teacher --->
+    app.patch('/user/teacher/:email', verifyToken, async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const user = await userCollection.findOne(query);
+      if (!user || !user?.status === 'requested') return res.status(400).send('You have allready requested, wait for approval')
+      const updatedDoc = {
+        $set: {
+          status: 'accepted',
+          role: 'teacher'
+        }
+      }
+      console.log(user)
+      const result = await userCollection.updateOne(query, updatedDoc)
+      console.log(result)
+      res.send(result)
+    })
+
+
+
 
     // ----------------------------------------------- 
     // --------->     Courses 
@@ -158,6 +170,7 @@ async function run() {
       const result = await courseCollection.findOne(query);
       res.send(result);
     });
+
 
 
 

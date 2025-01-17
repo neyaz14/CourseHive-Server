@@ -184,13 +184,13 @@ async function run() {
     // --------->     Courses 
     app.post('/courses', verifyToken, async (req, res) => {
       const courseInfo = req.body;
-      let TotalEnrollment =0;
+      let TotalEnrollment = 0;
       const count = 1;
       // check if courseInfo exists in db
       const result = await courseCollection.insertOne({
         ...courseInfo,
         // TODO : fix total enrollment number 
-        TotalEnrollment:0,
+        TotalEnrollment: 0,
         status: 'pending',
         timestamp: Date.now(),
       })
@@ -232,8 +232,13 @@ async function run() {
       console.log(result)
       res.send(result)
     })
-
-
+    // delete a course 
+    app.delete('/courses/:id',verifyToken ,async (req, res) => {
+     const id = req.params.id;
+     const query = {_id: new ObjectId(id)};
+     const result = await courseCollection.deleteOne(query);
+     res.send(result)
+    });
 
 
 

@@ -183,10 +183,14 @@ async function run() {
     // ----------------------------------------------- 
     // --------->     Courses 
     app.post('/courses', verifyToken, async (req, res) => {
-      const courseInfo = req.body
+      const courseInfo = req.body;
+      let TotalEnrollment =0;
+      const count = 1;
       // check if courseInfo exists in db
       const result = await courseCollection.insertOne({
         ...courseInfo,
+        // TODO : fix total enrollment number 
+        TotalEnrollment:0,
         status: 'pending',
         timestamp: Date.now(),
       })

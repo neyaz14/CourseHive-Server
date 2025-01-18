@@ -29,6 +29,7 @@ async function run() {
 
     const userCollection = client.db("courseHive").collection("users");
     const courseCollection = client.db("courseHive").collection("courses");
+    const assignmentCollection = client.db("courseHive").collection("assignments");
 
 
     // jwt related api
@@ -191,6 +192,8 @@ async function run() {
         ...courseInfo,
         // TODO : fix total enrollment number 
         TotalEnrollment: 0,
+        TotalAssignment: 0,
+        TotalSubmissionAssignment: 0,
         status: 'pending',
         timestamp: Date.now(),
       })
@@ -233,13 +236,33 @@ async function run() {
       res.send(result)
     })
     // delete a course 
-    app.delete('/courses/:id',verifyToken ,async (req, res) => {
-     const id = req.params.id;
-     const query = {_id: new ObjectId(id)};
-     const result = await courseCollection.deleteOne(query);
-     res.send(result)
+    app.delete('/courses/:id', verifyToken, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await courseCollection.deleteOne(query);
+      res.send(result)
     });
 
+
+
+    // -----------------------------------------------------------
+    // ------------ ------>> assingment 
+    app.post('/assignments', verifyToken, async (req, res) => {
+      const assignmentInfo = req.body;
+      let TotalEnrollment = 0;
+      const count = 1;
+      // check if courseInfo exists in db
+      const result = await courseCollection.insertOne({
+        ...assignmentInfo,
+        // TODO : fix total enrollment number 
+        TotalEnrollment: 0,
+        TotalAssignment: 0,
+        TotalSubmissionAssignment: 0,
+        status: 'pending',
+        timestamp: Date.now(),
+      })
+      res.send(result)
+    })
 
 
     // Send a ping to confirm a successful connection

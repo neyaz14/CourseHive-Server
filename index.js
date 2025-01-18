@@ -200,6 +200,36 @@ async function run() {
       })
       res.send(result)
     })
+    // update course
+    app.patch('/courses/:id', verifyToken, async (req, res) => {
+      const courseId = req.params.id;
+      const {
+        TeacherName,
+        TeacherEmail,
+        TeacherPhotoURL,
+        price,
+        description,
+        title,
+        image
+      } = req.body;
+      const updateData = {
+        TeacherName,
+        TeacherEmail,
+        TeacherPhotoURL,
+        price: parseFloat(price),
+        description,
+        title,
+        image
+      };
+      const query = {_id: new ObjectId(courseId)}
+      const result = await courseCollection.updateOne(
+        query,
+        { $set: updateData }
+      );
+      console.log(result)
+      res.send(result)
+  
+    })
 
     app.get('/courses', async (req, res) => {
       const result = await courseCollection.find().toArray();
@@ -213,6 +243,7 @@ async function run() {
       res.send(result);
     });
 
+    
     // accept 
     app.patch('/courses/acept/:id', verifyToken, async (req, res) => {
       const id = req.params.id;

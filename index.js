@@ -160,9 +160,9 @@ async function run() {
         },
         $set: { role: 'student' }
       }
-      console.log(user)
+      // console.log(user)
       const result = await userCollection.updateOne(query, updatedDoc)
-      console.log(result)
+      // console.log(result)
       res.send(result)
     })
     // make admin 
@@ -174,9 +174,9 @@ async function run() {
       const updatedDoc = {
         $set: { role: 'admin' }
       }
-      console.log(user)
+      // console.log(user)
       const result = await userCollection.updateOne(query, updatedDoc)
-      console.log(result)
+      // console.log(result)
       res.send(result)
     })
 
@@ -226,7 +226,7 @@ async function run() {
         query,
         { $set: updateData }
       );
-      console.log(result)
+      // console.log(result)
       res.send(result)
   
     })
@@ -253,7 +253,7 @@ async function run() {
         $set: { status: 'accepted' }
       }
       const result = await courseCollection.updateOne(query, updatedDoc)
-      console.log(result)
+      // console.log(result)
       res.send(result)
     })
     app.patch('/courses/reject/:id', verifyToken, async (req, res) => {
@@ -264,7 +264,7 @@ async function run() {
         $set: { status: 'rejected' }
       }
       const result = await courseCollection.updateOne(query, updatedDoc)
-      console.log(result)
+      // console.log(result)
       res.send(result)
     })
     // delete a course 

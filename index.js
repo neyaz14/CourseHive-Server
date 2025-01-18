@@ -54,6 +54,7 @@ async function run() {
         next();
       })
     }
+    // TODO : verify admin implement 
 
 
     // users related api
@@ -247,22 +248,30 @@ async function run() {
 
     // -----------------------------------------------------------
     // ------------ ------>> assingment 
+    // TODO : post assignment 
     app.post('/assignments', verifyToken, async (req, res) => {
       const assignmentInfo = req.body;
-      let TotalEnrollment = 0;
-      const count = 1;
-      // check if courseInfo exists in db
-      const result = await courseCollection.insertOne({
+      const {courseID } = assignmentInfo;
+      const result = await assignmentCollection.insertOne({
         ...assignmentInfo,
-        // TODO : fix total enrollment number 
-        TotalEnrollment: 0,
-        TotalAssignment: 0,
+        // TODO : fix submission 
         TotalSubmissionAssignment: 0,
-        status: 'pending',
-        timestamp: Date.now(),
       })
+      // TODO : Do the same in the case of total enrollments and submission 
+      await courseCollection.updateOne(
+        { _id:new ObjectId(courseID   ) },
+        { $inc: { TotalAssignment: 1 } }
+      );
       res.send(result)
     })
+
+    app.get('/assignments', async (req, res) => {
+      const result = await assignmentCollection.find().toArray();
+      res.send(result);
+    });
+    
+
+
 
 
     // Send a ping to confirm a successful connection

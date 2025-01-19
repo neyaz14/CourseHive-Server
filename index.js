@@ -225,14 +225,14 @@ async function run() {
         title,
         image
       };
-      const query = {_id: new ObjectId(courseId)}
+      const query = { _id: new ObjectId(courseId) }
       const result = await courseCollection.updateOne(
         query,
         { $set: updateData }
       );
       // console.log(result)
       res.send(result)
-  
+
     })
 
     app.get('/courses', async (req, res) => {
@@ -247,7 +247,7 @@ async function run() {
       res.send(result);
     });
 
-    
+
     // accept 
     app.patch('/courses/acept/:id', verifyToken, async (req, res) => {
       const id = req.params.id;
@@ -286,7 +286,7 @@ async function run() {
     // TODO : post assignment 
     app.post('/assignments', verifyToken, async (req, res) => {
       const assignmentInfo = req.body;
-      const {courseID } = assignmentInfo;
+      const { courseID } = assignmentInfo;
       const result = await assignmentCollection.insertOne({
         ...assignmentInfo,
         // TODO : fix submission 
@@ -294,7 +294,7 @@ async function run() {
       })
       // TODO : Do the same in the case of total enrollments and submission 
       await courseCollection.updateOne(
-        { _id:new ObjectId(courseID   ) },
+        { _id: new ObjectId(courseID) },
         { $inc: { TotalAssignment: 1 } }
       );
       res.send(result)
@@ -304,28 +304,49 @@ async function run() {
       const result = await assignmentCollection.find().toArray();
       res.send(result);
     });
-    
-// ! ---------------------------------------------------------------------
-//  * ------------- ------> enrolledInfo
-// TODO  :  FIX enrolledInfo 
-app.post('/enrolledINFO', verifyToken, async (req, res) => {
-  const enrolledInfo = req.body;
-  const {courseID } = enrolledInfo;
-  const result = await enrolledInfoCollection.insertOne({
-    ...enrolledInfo,
-    // TODO : fix submission 
-  })
-  // TODO : Do the same in the case of total enrollments and submission 
-  await enrolledInfoCollection.updateOne(
-    { _id:new ObjectId(courseID   ) },
-    { $inc: { TotalEnrollment: 1 } }
-  );
-  res.send(result)
-})
+
+    // ! ---------------------------------------------------------------------
+    //  * ------------- ------> enrolledInfo
+    // TODO  :  FIX enrolledInfo 
+    app.post('/enrolledINFO', verifyToken, async (req, res) => {
+      const enrolledInfo = req.body;
+      const { courseID } = enrolledInfo;
+      const result = await enrolledInfoCollection.insertOne({
+        ...enrolledInfo,
+        // TODO : fix submission 
+      })
+      // TODO : Do the same in the case of total enrollments and submission 
+      await enrolledInfoCollection.updateOne(
+        { _id: new ObjectId(courseID) },
+        { $inc: { TotalEnrollment: 1 } }
+      );
+      res.send(result)
+    })
 
 
+    app.get('/enrolledInfo', async (req, res) => {
+      const result = await enrolledInfoCollection.find().toArray();
+      res.send(result);
+    });
 
+    //? to get the enrolledCourse usign student email 
+    app.get('/enrolledCourse/:email', async (req, res) => {
+     const {email} = req.params;
+     const queryStudentEmail = {studentEmail:email}
+     const studentEmails = await enrolledInfoCollection.find(queryStudentEmail).toArray();
+     const courseIDs = studentEmails.map(enrollment =>new ObjectId(enrollment.courseID));
+     const queryCourseId = {_id: {$in:courseIDs}}
+     const courses = await courseCollection.find(queryCourseId).toArray();
+     console.log(courses)
+     res.send(courses)
+    });
 
+    // app.get('/courses/:id', async (req, res) => {
+    //   const id = req.params.id;
+    //   const query = { _id: new ObjectId(id) }
+    //   const result = await courseCollection.findOne(query);
+    //   res.send(result);
+    // });
 
 
 

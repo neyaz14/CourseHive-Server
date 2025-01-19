@@ -30,7 +30,7 @@ async function run() {
     const userCollection = client.db("courseHive").collection("users");
     const courseCollection = client.db("courseHive").collection("courses");
     const assignmentCollection = client.db("courseHive").collection("assignments");
-
+    const enrolledInfoCollection = client.db("courseHive").collection("enrolledInfo");
 
     // jwt related api
     app.post('/jwt', async (req, res) => {
@@ -281,7 +281,7 @@ async function run() {
 
 
 
-    // -----------------------------------------------------------
+    // ! -----------------------------------------------------------
     // ------------ ------>> assingment 
     // TODO : post assignment 
     app.post('/assignments', verifyToken, async (req, res) => {
@@ -305,6 +305,32 @@ async function run() {
       res.send(result);
     });
     
+// ! ---------------------------------------------------------------------
+//  * ------------- ------> enrolledInfo
+// TODO  :  FIX enrolledInfo 
+app.post('/enrolledINFO', verifyToken, async (req, res) => {
+  const enrolledInfo = req.body;
+  const {courseID } = enrolledInfo;
+  const result = await enrolledInfoCollection.insertOne({
+    ...enrolledInfo,
+    // TODO : fix submission 
+  })
+  // TODO : Do the same in the case of total enrollments and submission 
+  await enrolledInfoCollection.updateOne(
+    { _id:new ObjectId(courseID   ) },
+    { $inc: { TotalEnrollment: 1 } }
+  );
+  res.send(result)
+})
+
+
+
+
+
+
+
+
+
 
 
 

@@ -11,6 +11,7 @@ app.use(express.json());
 // 
 //
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { assign } = require('nodemailer/lib/shared');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.epj76.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -31,6 +32,7 @@ async function run() {
     const courseCollection = client.db("courseHive").collection("courses");
     const assignmentCollection = client.db("courseHive").collection("assignments");
     const enrolledInfoCollection = client.db("courseHive").collection("enrolledInfo");
+    const assignmentSubmissionCollection = client.db("courseHive").collection("assignmentSubmission");
 
     // jwt related api
     app.post('/jwt', async (req, res) => {
@@ -347,6 +349,29 @@ async function run() {
     //   const result = await courseCollection.findOne(query);
     //   res.send(result);
     // });
+
+    // !-----------------------------------------------------
+    // * post  
+    app.post('/assignmentSubmission', verifyToken, async (req, res) => {
+      const submissionInfo = req.body;
+      // const { courseID } = submissionInfo;
+      const {assignment}= submissionInfo;
+      const {_id, courseID}= assignment;
+      console.log(assignment)
+      const result = await assignmentSubmissionCollection.insertOne({
+        ...submissionInfo,
+      })
+      
+      await assignmentCollection.updateOne(
+        { _id: new ObjectId(_id) },
+        { $inc: { TotalSubmissionAssignment: 1 } }
+      );
+      await courseCollection.updateOne(
+        { _id: new ObjectId(courseID) },
+        { $inc: { TotalSubmissionAssignment: 1 } }
+      );
+      res.send(result)
+    })
 
 
 

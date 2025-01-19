@@ -33,6 +33,7 @@ async function run() {
     const assignmentCollection = client.db("courseHive").collection("assignments");
     const enrolledInfoCollection = client.db("courseHive").collection("enrolledInfo");
     const assignmentSubmissionCollection = client.db("courseHive").collection("assignmentSubmission");
+    const feedbackCollection = client.db("courseHive").collection("feedback");
 
     // jwt related api
     app.post('/jwt', async (req, res) => {
@@ -333,14 +334,14 @@ async function run() {
 
     //? to get the enrolledCourse usign student email 
     app.get('/enrolledCourse/:email', async (req, res) => {
-     const {email} = req.params;
-     const queryStudentEmail = {studentEmail:email}
-     const studentEmails = await enrolledInfoCollection.find(queryStudentEmail).toArray();
-     const courseIDs = studentEmails.map(enrollment =>new ObjectId(enrollment.courseID));
-     const queryCourseId = {_id: {$in:courseIDs}}
-     const courses = await courseCollection.find(queryCourseId).toArray();
-     console.log(courses)
-     res.send(courses)
+      const { email } = req.params;
+      const queryStudentEmail = { studentEmail: email }
+      const studentEmails = await enrolledInfoCollection.find(queryStudentEmail).toArray();
+      const courseIDs = studentEmails.map(enrollment => new ObjectId(enrollment.courseID));
+      const queryCourseId = { _id: { $in: courseIDs } }
+      const courses = await courseCollection.find(queryCourseId).toArray();
+      console.log(courses)
+      res.send(courses)
     });
 
     // app.get('/courses/:id', async (req, res) => {
@@ -355,13 +356,13 @@ async function run() {
     app.post('/assignmentSubmission', verifyToken, async (req, res) => {
       const submissionInfo = req.body;
       // const { courseID } = submissionInfo;
-      const {assignment}= submissionInfo;
-      const {_id, courseID}= assignment;
-      console.log(assignment)
+      const { assignment } = submissionInfo;
+      const { _id, courseID } = assignment;
+      // console.log(assignment)
       const result = await assignmentSubmissionCollection.insertOne({
         ...submissionInfo,
       })
-      
+
       await assignmentCollection.updateOne(
         { _id: new ObjectId(_id) },
         { $inc: { TotalSubmissionAssignment: 1 } }
@@ -372,7 +373,20 @@ async function run() {
       );
       res.send(result)
     })
- // TODO : post feedback data also in server side
+
+    // ! ---------------------------------------------------
+    // TODO : post feedback data also in server side
+
+    app.post('/feedback', verifyToken, async (req, res) => {
+      const feedbackInfo = req.body;
+      const { courseID } = feedbackInfo;
+      const result = await feedbackCollection.insertOne({
+        ...feedbackInfo,
+        
+      })
+      
+      res.send(result)
+    })
 
 
 

@@ -13,7 +13,11 @@ const port = process.env.PORT || 5000;
 //   credentials: true,
 //   optionSuccessStatus: 200,
 // }
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:5174','https://simple-firebase-4327b.web.app','https://simple-firebase-4327b.firebaseapp.com'],
+  credentials: true,
+  optionSuccessStatus: 200,
+}));
 app.use(express.json());
 app.use(cookieParser());
 // 

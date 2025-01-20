@@ -375,14 +375,13 @@ async function run() {
     })
 
     // ! ---------------------------------------------------
-    // TODO : post feedback data also in server side
+    // DOne : post feedback data also in server side
 
     app.post('/feedback', verifyToken, async (req, res) => {
       const feedbackInfo = req.body;
       const { courseID } = feedbackInfo;
       const result = await feedbackCollection.insertOne({
         ...feedbackInfo,
-        
       })
       
       res.send(result)

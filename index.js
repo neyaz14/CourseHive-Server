@@ -62,12 +62,22 @@ async function run() {
         next();
       })
     }
-    // TODO : verify admin implement 
+ 
+    const verifyAdmin = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      const isadmin = user.role === 'admin';
+      if (!isadmin) {
+        return res.status(403).send({ message: 'forbidden access' })
+      }
+      next();
+    }
 
 
     // users related api
     // TODO : make it secure 
-    app.get('/users', async (req, res) => {
+    app.get('/users',verifyToken, verifyAdmin, async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     });
@@ -136,7 +146,7 @@ async function run() {
     })
 
     // to make teacher --->
-    app.patch('/user/teacher/:email', verifyToken, async (req, res) => {
+    app.patch('/user/teacher/:email', verifyToken, verifyAdmin,async (req, res) => {
       const email = req.params.email;
       const query = { email };
       const user = await userCollection.findOne(query);

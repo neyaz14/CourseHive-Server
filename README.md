@@ -5,7 +5,7 @@ CourseHive Server is the backend service for the CourseHive platform, providing 
 
 ## Project Links
 - **Client Repository**:  https://github.com/Programming-Hero-Web-Course4/b10a12-client-side-neyaz14
-- **Server Repository**: https://github.com/Programming-Hero-Web-Course4/b10a12-server-side-neyaz14
+- **Server Repository**: https://github.com/neyaz14/CourseHive-Server
 - **Live Site**: https://simple-firebase-4327b.web.app/
 
 
